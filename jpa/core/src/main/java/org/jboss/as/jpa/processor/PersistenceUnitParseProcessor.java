@@ -98,28 +98,29 @@ public class PersistenceUnitParseProcessor implements DeploymentUnitProcessor {
     }
 
 
-	/**
-	 * Checks for different *persistence.xml files. 
-	 * The first persistence.xml file which could be found will be returned. If none could be found it falls back to the highest index in the persistenceXmlOrder array
-	 * @see WLDFLY-2816 
-	 * @param vfsResourceRoot root directory to check for one of the persistence.xml files
-	 * @param persistenceXmlOrder array with paths under vfsResourceRoot to look
-	 * @return VirtualFile instance
-	 */	
+    /**
+     * Checks for different *persistence.xml files.
+     * The first persistence.xml file which could be found will be returned. If none could be found it falls back to the highest index in the persistenceXmlOrder array
+     * @see WLDFLY-2816
+     * @param vfsResourceRoot root directory to check for one of the persistence.xml files
+     * @param persistenceXmlOrder array with paths under vfsResourceRoot to look
+     * @return VirtualFile instance
+     */
     private VirtualFile detectPersistenceXml(VirtualFile vfsResourceRoot, String[] persistenceXmlOrder) {
-		VirtualFile vfPreferedPersistenceXml = null;
-		String usedPath = null;
-	
-		for (usedPath : persistenceXmlOrder) {
-			vfPreferedPersistenceXml = vfsResourceRoot.getChild(path);
+        VirtualFile vfPreferedPersistenceXml = null;
+        String usedPath = null;
 
-			if (vfPreferedPersistenceXml != null && vfPreferedPersistenceXml.exists()) {
-				break;
-			} 
-		}
+        for (int i = 0, m = persistenceXmlOrder.length; i < m; i++) {
+            usedPath = persistenceXmlOrder[i];
+            vfPreferedPersistenceXml = vfsResourceRoot.getChild(usedPath);
 
-		JPA_LOGGER.tracef("using %s as persistence.xml file", usedPath);
-		return vfPreferedPersistenceXml;
+            if (vfPreferedPersistenceXml != null && vfPreferedPersistenceXml.exists()) {
+                break;
+            }
+        }
+
+        JPA_LOGGER.tracef("using %s as persistence.xml file", usedPath);
+        return vfPreferedPersistenceXml;
     }
 
     private void handleJarDeployment(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
@@ -132,7 +133,7 @@ public class PersistenceUnitParseProcessor implements DeploymentUnitProcessor {
             List<PersistenceUnitMetadataHolder> listPUHolders = new ArrayList<PersistenceUnitMetadataHolder>(1);
             // handle META-INF/persistence.xml
             final ResourceRoot deploymentRoot = deploymentUnit.getAttachment(Attachments.DEPLOYMENT_ROOT);
-            VirtualFile persistence_xml = detectPersistenceXml(deploymentRoot.getRoot(), new String[] { META_INF_JBOSS_PERSISTENCE_XML, META_INF_PERSISTENCE_XML }); 
+            VirtualFile persistence_xml = detectPersistenceXml(deploymentRoot.getRoot(), new String[] { META_INF_JBOSS_PERSISTENCE_XML, META_INF_PERSISTENCE_XML });
             parse(persistence_xml, listPUHolders, deploymentUnit);
             PersistenceUnitMetadataHolder holder = normalize(listPUHolders);
             // save the persistent unit definitions
@@ -157,7 +158,7 @@ public class PersistenceUnitParseProcessor implements DeploymentUnitProcessor {
             // handle WEB-INF/classes/META-INF/persistence.xml
             final ResourceRoot deploymentRoot = deploymentUnit.getAttachment(Attachments.DEPLOYMENT_ROOT);
 
-			VirtualFile persistence_xml = detectPersistenceXml(deploymentRoot.getRoot(), new String[] { WEB_JBOSS_PERSISTENCE_XML, WEB_PERSISTENCE_XML });
+            VirtualFile persistence_xml = detectPersistenceXml(deploymentRoot.getRoot(), new String[] { WEB_JBOSS_PERSISTENCE_XML, WEB_PERSISTENCE_XML });
             parse(persistence_xml, listPUHolders, deploymentUnit);
             PersistenceUnitMetadataHolder holder = normalize(listPUHolders);
             deploymentRoot.putAttachment(PersistenceUnitMetadataHolder.PERSISTENCE_UNITS, holder);
@@ -172,7 +173,7 @@ public class PersistenceUnitParseProcessor implements DeploymentUnitProcessor {
                 if (resourceRoot.getRoot().getName().toLowerCase(Locale.ENGLISH).endsWith(JAR_FILE_EXTENSION)) {
                     listPUHolders = new ArrayList<PersistenceUnitMetadataHolder>(1);
                     // persistence_xml = resourceRoot.getRoot().getChild(META_INF_PERSISTENCE_XML);
-					persistence_xml = detectPersistenceXml(resourceRoot.getRoot(), new String[] { META_INF_JBOSS_PERSISTENCE_XML, META_INF_PERSISTENCE_XML });
+                    persistence_xml = detectPersistenceXml(resourceRoot.getRoot(), new String[] { META_INF_JBOSS_PERSISTENCE_XML, META_INF_PERSISTENCE_XML });
                     parse(persistence_xml, listPUHolders, deploymentUnit);
                     holder = normalize(listPUHolders);
                     resourceRoot.putAttachment(PersistenceUnitMetadataHolder.PERSISTENCE_UNITS, holder);
@@ -197,7 +198,7 @@ public class PersistenceUnitParseProcessor implements DeploymentUnitProcessor {
             // handle META-INF/persistence.xml
             final ResourceRoot deploymentRoot = deploymentUnit.getAttachment(Attachments.DEPLOYMENT_ROOT);
             VirtualFile persistence_xml = detectPersistenceXml(deploymentRoot.getRoot(), new String[] { META_INF_JBOSS_PERSISTENCE_XML, META_INF_PERSISTENCE_XML });
-			parse(persistence_xml, listPUHolders, deploymentUnit);
+            parse(persistence_xml, listPUHolders, deploymentUnit);
             PersistenceUnitMetadataHolder holder = normalize(listPUHolders);
             deploymentRoot.putAttachment(PersistenceUnitMetadataHolder.PERSISTENCE_UNITS, holder);
             addApplicationDependenciesOnProvider( deploymentUnit, holder);
